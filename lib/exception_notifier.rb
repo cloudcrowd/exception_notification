@@ -21,7 +21,14 @@ class ExceptionNotifier
     options = (env['exception_notifier.options'] ||= {})
     options.reverse_merge!(@options)
 
-    unless Array.wrap(options[:ignore_exceptions]).include?(exception.class)
+    should_ignore   = Array.wrap(options[:ignore_exceptions]).include?(exception.class)
+    should_ignore ||= begin
+      controller = env['action_controller.instance'] and
+      controller.respond_to?(:ignore_notification_of_exception?) and
+      controller.ignore_notification_of_exception?(::Rack::Request.new(env), exception) == true
+    end
+
+    unless should_ignore
       Notifier.exception_notification(env, exception).deliver
       env['exception_notifier.delivered'] = true
     end
