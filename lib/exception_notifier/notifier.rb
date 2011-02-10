@@ -37,6 +37,7 @@ class ExceptionNotifier
     end
 
     def exception_notification(env, exception)
+      
       @env        = env
       @exception  = exception
       @options    = (env['exception_notifier.options'] || {}).reverse_merge(self.class.default_options)
@@ -52,6 +53,20 @@ class ExceptionNotifier
 
       prefix   = "#{@options[:email_prefix]}#{@kontroller.controller_name}##{@kontroller.action_name}"
       subject  = "#{prefix} (#{@exception.class}) #{@exception.message.inspect}"
+
+      # FIXME, :sendmail mail delivery method does not seem to work
+      if @options[:method] && @options[:method] != :smtp
+        ActionMailer::Base.delivery_method = @options[:method]
+      end
+
+      if ActionMailer::Base.delivery_method == :sendmail
+        raise "sendmail method not working yet"
+      end
+
+      # FIXME, this is a hack to use Non-SSL connection to deliver exception email, need to review whether this is secure
+      if ActionMailer::Base.delivery_method == :smtp
+        ActionMailer::Base.smtp_settings.merge!({:enable_starttls_auto => false})
+      end
 
       mail(:to => @options[:exception_recipients], :from => @options[:sender_address], :subject => subject) do |format|
         format.text { render "#{mailer_name}/exception_notification" }
