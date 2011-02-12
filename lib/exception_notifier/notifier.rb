@@ -51,8 +51,7 @@ class ExceptionNotifier
         instance_variable_set("@#{name}", value)
       end
 
-      prefix   = "#{@options[:email_prefix]}#{@kontroller.controller_name}##{@kontroller.action_name}"
-      subject  = "#{prefix} (#{@exception.class}) #{@exception.message.inspect}"
+      subject = render("#{mailer_name}/subject")
 
       # FIXME, :sendmail mail delivery method does not seem to work
       if @options[:method] && @options[:method] != :smtp
@@ -75,15 +74,15 @@ class ExceptionNotifier
     end
 
     private
-      
+
       def clean_backtrace(exception)
         Rails.respond_to?(:backtrace_cleaner) ?
           Rails.backtrace_cleaner.send(:filter, exception.backtrace) :
           exception.backtrace
       end
-      
+
       helper_method :inspect_object
-      
+
       def inspect_object(object)
         case object
         when Hash, Array
@@ -94,6 +93,6 @@ class ExceptionNotifier
           object.to_s
         end
       end
-      
+
   end
 end
