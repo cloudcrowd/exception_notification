@@ -53,17 +53,7 @@ class ExceptionNotifier
 
       subject = render("#{mailer_name}/subject")
 
-      # FIXME, :sendmail mail delivery method does not seem to work
-      if @options[:method] && @options[:method] != :smtp
-        ActionMailer::Base.delivery_method = @options[:method]
-      end
-
-      # FIXME make sendmail work
-      if ActionMailer::Base.delivery_method == :sendmail
-        $LOG.warn {"sendmail exception notification method not working yet"} if $LOG
-      end
-
-      # FIXME, this is a hack to use Non-SSL connection to deliver exception email, need to review whether this is secure
+      # FIXME: this is a hack to use Non-SSL connection to deliver exception email, need to review whether this is secure
       if ActionMailer::Base.delivery_method == :smtp
         ActionMailer::Base.smtp_settings.merge!({:enable_starttls_auto => false})
       end
