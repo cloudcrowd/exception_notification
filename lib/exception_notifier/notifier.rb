@@ -52,6 +52,12 @@ class ExceptionNotifier
 
       subject = render("#{mailer_name}/subject")
 
+      # FIXME, this is a hack to use Non-SSL connection to deliver exception
+      # email, need to review whether this is secure.
+      if ActionMailer::Base.delivery_method == :smtp
+        ActionMailer::Base.smtp_settings.merge!({:enable_starttls_auto => false})
+      end
+
       mail(:to => @options[:exception_recipients], :from => @options[:sender_address], :subject => subject) do |format|
         format.text { render "#{mailer_name}/exception_notification" }
       end
