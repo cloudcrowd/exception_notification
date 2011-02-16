@@ -4,6 +4,9 @@ require 'pp'
 class ExceptionNotifier
   class Notifier < ActionMailer::Base
     self.mailer_name = 'exception_notifier'
+
+    # Allow application templates to override default templates
+    self.append_view_path "#{Rails.root}/app/views" if defined? Rails
     self.append_view_path "#{File.dirname(__FILE__)}/views"
 
     class << self
