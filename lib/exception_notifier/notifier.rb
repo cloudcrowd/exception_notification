@@ -53,7 +53,7 @@ class ExceptionNotifier
         instance_variable_set("@#{name}", value)
       end
 
-      subject = render("#{mailer_name}/subject")
+      subject = render("#{mailer_name}/subject").chomp
 
       # FIXME, this is a hack to use Non-SSL connection to deliver exception
       # email, need to review whether this is secure.
