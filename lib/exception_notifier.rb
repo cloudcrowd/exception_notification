@@ -16,7 +16,16 @@ class ExceptionNotifier
   end
 
   def call(env)
-    @app.call(env)
+    manually_raised = false
+
+    status, headers, body = @app.call(env)
+
+    if headers['X-Cascade'] == 'pass'
+      manually_raised = true
+      raise ActionController::RoutingError, "No route matches #{env['PATH_INFO'].inspect}"
+    end
+
+    [status, headers, body]
   rescue Exception => exception
     options = (env['exception_notifier.options'] ||= {})
     options.reverse_merge!(@options)
@@ -33,6 +42,6 @@ class ExceptionNotifier
       env['exception_notifier.delivered'] = true
     end
 
-    raise exception
+    raise exception unless manually_raised
   end
 end
