@@ -43,5 +43,6 @@ class ExceptionNotifier
     end
 
     raise exception unless manually_raised
+    return [status, headers, body]
   end
 end
