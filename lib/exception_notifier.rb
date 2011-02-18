@@ -18,30 +18,34 @@ class ExceptionNotifier
   def call(env)
     manually_raised = false
 
-    status, headers, body = @app.call(env)
+    begin
+      status, headers, body = @app.call(env)
 
-    if headers['X-Cascade'] == 'pass'
-      manually_raised = true
-      raise ActionController::RoutingError, "No route matches #{env['PATH_INFO'].inspect}"
+      if headers['X-Cascade'] == 'pass'
+        manually_raised = true
+        raise ActionController::RoutingError, "No route matches #{env['PATH_INFO'].inspect}"
+      end
+
+    rescue Exception => exception
+      options = (env['exception_notifier.options'] ||= {})
+      options.reverse_merge!(@options)
+
+      should_ignore   = Array.wrap(options[:ignore_exceptions]).include?(exception.class)
+      should_ignore ||= begin
+          controller = env['action_controller.instance'] and
+          controller.respond_to?(:ignore_notification_of_exception?) and
+          controller.ignore_notification_of_exception?(::Rack::Request.new(env), exception) == true
+      end
+
+      unless should_ignore
+        Notifier.exception_notification(env, exception).deliver
+        env['exception_notifier.delivered'] = true
+      end
+
+      raise exception unless manually_raised
     end
 
     [status, headers, body]
-  rescue Exception => exception
-    options = (env['exception_notifier.options'] ||= {})
-    options.reverse_merge!(@options)
-
-    should_ignore   = Array.wrap(options[:ignore_exceptions]).include?(exception.class)
-    should_ignore ||= begin
-      controller = env['action_controller.instance'] and
-      controller.respond_to?(:ignore_notification_of_exception?) and
-      controller.ignore_notification_of_exception?(::Rack::Request.new(env), exception) == true
-    end
-
-    unless should_ignore
-      Notifier.exception_notification(env, exception).deliver
-      env['exception_notifier.delivered'] = true
-    end
-
-    raise exception unless manually_raised
   end
+
 end
