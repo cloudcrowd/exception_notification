@@ -77,14 +77,17 @@ class ExceptionNotifier
       helper_method :inspect_object
 
       def inspect_object(object)
-        case object
-        when Hash, Array
-          object.inspect
-        when ActionController::Base
-          "#{object.controller_name}##{object.action_name}"
-        else
-          object.to_s
+        if object.kind_of?(Hash) || object.kind_of?(Array)
+          return object.inspect
         end
+
+        # make no assumption that we are running inside rails
+        if Object.const_defined?(:ActionController) && ActionController.const_defined?(:Base)
+          if object.kind_of?(ActionController::Base)
+            return "#{object.controller_name}##{object.action_name}"
+          end
+        end
+        return object.to_s
       end
 
   end
