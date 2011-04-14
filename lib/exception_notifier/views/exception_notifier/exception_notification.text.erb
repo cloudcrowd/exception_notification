@@ -1,8 +1,9 @@
+<% if @exception %>
 A <%= @exception.class %> occurred in <%= @kontroller.controller_name %>#<%= @kontroller.action_name %>:
 
   <%= raw @exception.message %>
   <%= raw @backtrace.first %>
-
+<% end %>
 <%  sections = @sections.map do |section|
       summary = render(section).strip
       unless summary.blank?
