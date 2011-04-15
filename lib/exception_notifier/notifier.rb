@@ -53,7 +53,8 @@ class ExceptionNotifier
         instance_variable_set("@#{name}", value)
       end
 
-      subject = render("#{mailer_name}/subject").chomp
+      # render subject line and make sure it does not contain newline character
+      subject = render("#{mailer_name}/subject").chomp.gsub("\n", ' ')
 
       # FIXME, this is a hack to use Non-SSL connection to deliver exception
       # email, need to review whether this is secure.
