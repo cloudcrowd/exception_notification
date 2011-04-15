@@ -1,10 +1,10 @@
 <%= @options[:email_prefix] %>
+<% if @options[:email_subject] %>
+<%= @options[:email_subject] %>
+<% end %>
 <% if @kontroller %>
 <%= @kontroller.controller_name%>#<%= @kontroller.action_name %>
 <% end %>
 <% if @exception %>
 (<%= @exception.class %>) <%= raw @exception.message.to_s %>
-<% end %>
-<% if @options[:email_subject] %>
-<%= @options[:email_subject] %>
 <% end %>
