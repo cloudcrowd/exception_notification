@@ -2,7 +2,7 @@
 <% if @options[:email_subject] %>
 <%= @options[:email_subject] %>
 <% end %>
-<% if @kontroller %>
+<% if @kontroller and !(@kontroller.is_a?(ExceptionNotifier::Notifier::MissingController)) %>
 <%= @kontroller.controller_name%>#<%= @kontroller.action_name %>
 <% end %>
 <% if @exception %>
