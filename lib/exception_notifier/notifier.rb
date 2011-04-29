@@ -6,7 +6,7 @@ class ExceptionNotifier
     self.mailer_name = 'exception_notifier'
 
     # Allow application templates to override default templates
-    self.append_view_path "#{Rails.root}/app/views" if defined? Rails
+    self.append_view_path "#{Rails.root}/app/views" if defined? Rails && Rails.root
     self.append_view_path "#{File.dirname(__FILE__)}/views"
 
     class << self
