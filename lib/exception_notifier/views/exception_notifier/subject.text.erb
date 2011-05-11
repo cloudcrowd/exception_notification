@@ -6,5 +6,5 @@
 <%= @kontroller.controller_name%>#<%= @kontroller.action_name %>
 <% end %>
 <% if @exception %>
-(<%= @exception.class %>) <%= raw @exception.message.to_s %>
+<%= raw @exception.message.to_s %> (<%= @exception.class %>)
 <% end %>
